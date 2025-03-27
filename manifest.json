@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "copy",
-  "version": "1.0",
-  "description": "自动保存浏览器中复制的内容到文本文件",
+  "name": "Copy Saver",
+  "version": "1.0.0",
+  "description": "一个便捷的Chrome扩展，可以自动将您在浏览器中复制的内容保存到本地文本文件中。支持自定义保存路径，帮助您更好地管理和整理复制的信息。",
+  "default_locale": "zh_CN",
   "permissions": [
     "clipboardRead",
     "storage",
