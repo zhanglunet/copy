@@ -1,6 +1,6 @@
 # 复制保存器网站部署指南
 
-本文档详细说明如何将复制保存器官方网站部署到Cloudflare Pages，并配置copy.pub域名。
+本文档详细说明如何将复制保存器官方网站部署到Cloudflare Pages，并配置copy.pub域名。本指南包含完整的自动化部署流程，从GitHub仓库到Cloudflare Pages的全过程。
 
 ## Cloudflare Pages部署流程
 
@@ -52,7 +52,40 @@
 
 ## GitHub Actions自动部署
 
-项目已配置GitHub Actions工作流，当代码推送到main分支时会自动部署到Cloudflare Pages。
+项目已配置GitHub Actions工作流，当代码推送到main分支时会自动部署到Cloudflare Pages。这种自动化部署方式确保了网站内容的实时更新，无需手动操作。
+
+### GitHub Actions工作流配置
+
+项目使用`.github/workflows/cloudflare.yml`文件配置自动部署流程。以下是配置文件的主要内容：
+
+```yaml
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: copy-pub
+          directory: website
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+```
+
+这个工作流会在以下情况触发：
+- 当代码推送到`main`分支时
+- 当有针对`main`分支的Pull Request时
 
 ### 配置GitHub Secrets
 
@@ -62,16 +95,48 @@
 2. `CLOUDFLARE_ACCOUNT_ID`：Cloudflare账户ID
 
 获取方法：
-- API令牌：在Cloudflare控制台 > 个人资料 > API令牌 > 创建令牌
+- API令牌：在Cloudflare控制台 > 个人资料 > API令牌 > 创建令牌（需要确保令牌具有Pages部署权限）
 - 账户ID：在Cloudflare控制台右侧边栏底部可以找到
+
+### 配置步骤
+
+1. 在GitHub仓库页面，点击「Settings」
+2. 在左侧菜单中选择「Secrets and variables」>「Actions」
+3. 点击「New repository secret」按钮
+4. 分别添加`CLOUDFLARE_API_TOKEN`和`CLOUDFLARE_ACCOUNT_ID`两个密钥
+5. 添加完成后，这些密钥将可用于GitHub Actions工作流
 
 ## 文件说明
 
-- `.cloudflare/pages.json`：Cloudflare Pages配置文件
-- `.github/workflows/cloudflare.yml`：GitHub Actions工作流配置
-- `_headers`：HTTP响应头配置
-- `_redirects`：URL重定向规则
-- `CNAME`：自定义域名配置
+### 配置文件
+
+- `.cloudflare/pages.json`：Cloudflare Pages配置文件，定义了项目名称、构建设置和HTTP响应头等
+- `.github/workflows/cloudflare.yml`：GitHub Actions工作流配置，定义了自动部署流程
+- `_headers`：HTTP响应头配置，用于增强网站安全性
+- `_redirects`：URL重定向规则，用于设置页面重定向
+- `CNAME`：自定义域名配置，指定网站的自定义域名
+
+### 安全配置
+
+在`.cloudflare/pages.json`文件中，我们配置了以下安全相关的HTTP响应头：
+
+```json
+"headers": {
+  "/*": {
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer-when-downgrade",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+  }
+}
+```
+
+这些响应头的作用：
+
+- `X-Frame-Options: DENY`：防止网站被嵌入到iframe中，避免点击劫持攻击
+- `X-Content-Type-Options: nosniff`：防止浏览器猜测（嗅探）文件的MIME类型
+- `Referrer-Policy`：控制HTTP请求中包含的引用来源信息
+- `Permissions-Policy`：限制网站使用特定的浏览器功能和API
 
 ## 测试部署
 

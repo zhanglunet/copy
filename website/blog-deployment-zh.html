@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复制保存器：从开发到部署的全过程 | copy.pub</title>
+    <meta name="description" content="详细介绍复制保存器Chrome扩展的开发历程，以及如何将其官方网站部署到Cloudflare Pages，实现自动化的持续部署流程。">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        .blog-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .blog-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .blog-content h2 {
+            font-size: 2rem;
+            margin: 30px 0 15px;
+            color: #4285f4;
+        }
+        .blog-content h3 {
+            font-size: 1.5rem;
+            margin: 25px 0 10px;
+            color: #555;
+        }
+        .blog-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .blog-content code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .blog-content pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .blog-content pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .blog-content a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        .blog-content a:hover {
+            text-decoration: underline;
+        }
+        .blog-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .blog-header {
+            background-color: #f0f7ff;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-size: 2.8rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .blog-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .back-to-home {
+            display: inline-block;
+            margin: 30px 0;
+            padding: 10px 20px;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .back-to-home:hover {
+            background-color: #3367d6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/logo.svg" alt="复制保存器图标">
+                <h1>复制保存器</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#features">功能</a></li>
+                    <li><a href="index.html#download">下载</a></li>
+                    <li><a href="index.html#faq">常见问题</a></li>
+                    <li><a href="#">博客</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="blog-header">
+        <div class="container">
+            <h1>复制保存器：从开发到部署的全过程</h1>
+            <p>详细介绍复制保存器Chrome扩展的开发历程，以及如何将其官方网站部署到Cloudflare Pages，实现自动化的持续部署流程。</p>
+        </div>
+    </section>
+
+    <section class="blog-content">
+        <div class="container">
+            <a href="index.html" class="back-to-home">返回首页</a>
+            
+            <p>在这篇文章中，我将详细介绍复制保存器Chrome扩展的开发历程，以及如何将其官方网站部署到Cloudflare Pages，实现自动化的持续部署流程。</p>
+
+            <h2>项目背景</h2>
+            <p>复制保存器（Copy Saver）是一个Chrome扩展，它能够自动捕获并保存用户在浏览器中复制的所有内容。这个项目源于日常工作中的一个痛点：我们经常需要从网页上复制大量文本内容，这些内容散落在剪贴板中，很容易丢失。通过自动收集这些内容到一个文本文件中，用户可以更方便地进行二次加工和处理，特别是与大语言模型结合使用时。</p>
+
+            <h2>扩展开发过程</h2>
+            <h3>核心功能实现</h3>
+            <p>复制保存器的核心功能是监听浏览器中的复制事件，捕获复制的文本内容，并将其保存下来。实现这一功能主要依靠以下几个组件：</p>
+            <ol>
+                <li><strong>contentScript.js</strong>：注入到网页中的脚本，负责监听复制事件</li>
+                <li><strong>background.js</strong>：后台脚本，处理文件保存逻辑</li>
+                <li><strong>popup.html/popup.js</strong>：用户界面，提供简单的配置选项</li>
+            </ol>
+            <p>在<code>contentScript.js</code>中，我们使用DOM事件监听器来捕获用户的复制操作：</p>
+            <pre><code class="language-javascript">document.addEventListener('copy', function(event) {
+    // 获取选中的文本
+    const text = window.getSelection().toString();
+    
+    // 如果有选中的文本，则发送消息到background.js
+    if (text && text.trim().length > 0) {
+        sendMessageToBackground(text);
+    }
+});</code></pre>
+            <p>而在<code>background.js</code>中，我们实现了文本保存的核心逻辑，为复制的文本添加时间戳，并将其追加到当天的文本文件中。</p>
+
+            <h3>开发挑战与解决方案</h3>
+            <p>在开发过程中，我们遇到了一些挑战：</p>
+            <ol>
+                <li><strong>文件系统API权限问题</strong>：最初计划使用Chrome的文件系统API让用户选择保存目录，但这种方式存在权限获取复杂且容易失效的问题。我们改用<code>chrome.downloads</code> API替代文件系统API，将文件直接保存到用户的下载文件夹，大大简化了权限管理。</li>
+                <li><strong>复制事件捕获问题</strong>：某些网站使用自定义的复制机制，导致扩展程序无法捕获复制操作。我们优化了事件监听逻辑，增强了对不同复制机制的兼容性。</li>
+            </ol>
+
+            <h2>SVG到PNG的转换解决方案</h2>
+            <p>在项目开发过程中，我们选择使用SVG格式的图像作为主要图形资源，因为SVG具有无损缩放、文件小、易于编辑等优点。然而，为了兼容所有浏览器和确保最佳显示效果，我们需要同时提供PNG格式的图像作为备选。</p>
+            <p>为了自动化这一转换过程，我们开发了两个转换脚本：</p>
+            <ol>
+                <li><strong>convert.js</strong>：用于转换扩展图标和宣传图片</li>
+            </ol>
+            <pre><code class="language-javascript">const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+
+const svgFiles = [
+  'images/icon16.svg',
+  'images/icon48.svg',
+  'images/icon128.svg',
+  'images/promo-large.svg',
+  'images/promo-small.svg'
+];
+
+async function convertSvgToPng(svgPath) {
+  const pngPath = svgPath.replace('.svg', '.png');
+  try {
+    await sharp(svgPath)
+      .png({
+        compressionLevel: 9,
+        quality: 100,
+        chromaSubsampling: '4:4:4',
+        force: true
+      })
+      .toFile(pngPath);
+    console.log(`Converted ${svgPath} to ${pngPath}`);
+  } catch (error) {
+    console.error(`Error converting ${svgPath}:`, error);
+  }
+}
+
+async function main() {
+  for (const svgFile of svgFiles) {
+    await convertSvgToPng(svgFile);
+  }
+}
+
+main().catch(console.error);</code></pre>
+            <ol start="2">
+                <li><strong>convert-web-images.js</strong>：用于转换网站中的SVG图像</li>
+            </ol>
+            <pre><code class="language-javascript">const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+
+// 网站中需要转换的SVG文件列表
+const svgFiles = [
+  'website/images/feature-export.svg',
+  'website/images/hero-image.svg',
+  'website/images/logo.svg',
+  'website/images/feature-auto-save.svg',
+  'website/images/feature-history.svg',
+  'website/images/feature-ui.svg'
+];
+
+async function convertSvgToPng(svgPath) {
+  const pngPath = svgPath.replace('.svg', '.png');
+  try {
+    // 检查源文件是否存在
+    if (!fs.existsSync(svgPath)) {
+      console.error(`源文件不存在: ${svgPath}`);
+      return;
+    }
+    
+    await sharp(svgPath)
+      .png({
+        compressionLevel: 9,
+        quality: 100,
+        chromaSubsampling: '4:4:4',
+        force: true
+      })
+      .toFile(pngPath);
+    console.log(`已转换 ${svgPath} 为 ${pngPath}`);
+  } catch (error) {
+    console.error(`转换 ${svgPath} 时出错:`, error);
+  }
+}
+
+async function main() {
+  for (const svgFile of svgFiles) {
+    await convertSvgToPng(svgFile);
+  }
+  console.log('所有SVG图像已转换为PNG格式');
+}
+
+main().catch(console.error);</code></pre>
+            <p>这两个脚本使用<code>sharp</code>库进行图像处理，它能够高效地将SVG文件转换为高质量的PNG图像。通过这种方式，我们可以在设计过程中专注于SVG格式，然后自动生成所需的PNG文件，大大提高了工作效率。</p>
+
+            <h2>自动化部署流程</h2>
+            <p>为了简化网站的更新和部署过程，我们采用了Cloudflare Pages作为托管平台，并配置了GitHub Actions实现自动化部署。</p>
+
+            <h3>Cloudflare Pages配置</h3>
+            <p>Cloudflare Pages是一个静态网站托管服务，它提供了全球CDN分发、自动HTTPS、自定义域名等功能。我们通过以下步骤配置了Cloudflare Pages：</p>
+            <ol>
+                <li>创建Cloudflare Pages项目，连接到GitHub仓库</li>
+                <li>配置构建设置，指定<code>website</code>目录作为输出目录</li>
+                <li>添加自定义域名<code>copy.pub</code></li>
+            </ol>
+            <p>在<code>.cloudflare/pages.json</code>文件中，我们定义了Pages项目的配置：</p>
+            <pre><code class="language-json">{
+  "name": "copy-pub",
+  "main": "website",
+  "build": {
+    "baseDirectory": "website",
+    "command": null,
+    "destinationDirectory": "."
+  },
+  "routes": [
+    { "pattern": "**/*", "script": null }
+  ],
+  "headers": {
+    "/*": {
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "no-referrer-when-downgrade",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    }
+  }
+}</code></pre>
+
+            <h3>GitHub Actions自动部署</h3>
+            <p>为了实现持续部署，我们配置了GitHub Actions工作流。每当代码推送到main分支或有针对main分支的Pull Request时，GitHub Actions会自动触发部署流程，将最新的网站内容部署到Cloudflare Pages。</p>
+            <p>以下是<code>.github/workflows/cloudflare.yml</code>文件的内容：</p>
+            <pre><code class="language-yaml">name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Pages
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: copy-pub
+          directory: website
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}</code></pre>
+            <p>这个工作流使用官方的Cloudflare Pages Action，需要配置两个关键的GitHub Secrets：</p>
+            <ol>
+                <li><code>CLOUDFLARE_API_TOKEN</code>：Cloudflare API令牌</li>
+                <li><code>CLOUDFLARE_ACCOUNT_ID</code>：Cloudflare账户ID</li>
+            </ol>
+            <p>通过这种配置，我们实现了完全自动化的部署流程：开发人员只需将更改推送到GitHub仓库，剩下的部署工作会自动完成。</p>
+
+            <h2>域名配置</h2>
+            <p>为了提供更专业的用户体验，我们为复制保存器官方网站注册了<code>copy.pub</code>域名，并将其配置到Cloudflare Pages项目中：</p>
+            <ol>
+                <li>在Cloudflare控制台中添加<code>copy.pub</code>域名</li>
+                <li>配置DNS记录，将根域名指向Cloudflare Pages分配的域名</li>
+                <li>在Pages项目中添加自定义域名</li>
+            </ol>
+            <p>通过这种配置，用户可以通过<code>https://copy.pub</code>访问官方网站，同时享受Cloudflare提供的CDN加速和安全保护。</p>
+
+            <h2>总结与经验分享</h2>
+            <p>通过复制保存器项目的开发和部署过程，我们积累了一些有价值的经验：</p>
+            <ol>
+                <li><strong>使用SVG格式的图像</strong>：SVG格式不仅文件小，而且可以无损缩放，非常适合网站和扩展程序的图标设计。通过自动化转换脚本，可以同时兼顾设计灵活性和兼容性。</li>
+                <li><strong>自动化部署流程</strong>：利用GitHub Actions和Cloudflare Pages的集成，可以实现完全自动化的部署流程，大大减少了手动操作的工作量和出错可能。</li>
+                <li><strong>安全配置</strong>：通过合理配置HTTP响应头和权限策略，可以提高网站的安全性，防止常见的安全问题。</li>
+                <li><strong>文档驱动开发</strong>：详细的部署文档不仅有助于团队协作，也方便后期维护和问题排查。</li>
+            </ol>
+            <p>复制保存器项目从创意到实现，再到部署上线，展示了现代Web开发的完整流程。通过合理利用各种工具和服务，我们可以高效地开发和部署Web应用，为用户提供更好的体验。</p>
+            <p>如果你对复制保存器感兴趣，可以访问<a href="https://copy.pub">官方网站</a>了解更多信息，或者直接从<a href="https://chrome.google.com/webstore/detail/copy-saver/">Chrome网上应用店</a>安装扩展程序。</p>
+
+            <a href="index.html" class="back-to-home">返回首页</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.svg" alt="复制保存器图标">
+                    <h2>复制保存器</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>链接</h3>
+                    <ul>
+                        <li><a href="index.html#features">功能</a></li>
+                        <li><a href="index.html#download">下载</a></li>
+                        <li><a href="index.html#faq">常见问题</a></li>
+                        <li><a href="blog-deployment-zh.html">博客</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>联系我们</h3>
+                    <p>如有任何问题或建议，请发送邮件至：</p>
+                    <a href="mailto:support@copy.pub">support@copy.pub</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 复制保存器. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
