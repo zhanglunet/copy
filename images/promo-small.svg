@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="440" height="280" viewBox="0 0 440 280" xmlns="http://www.w3.org/2000/svg">
+  <rect width="440" height="280" fill="#f5f5f5"/>
+  <g transform="translate(120,90)">
+    <path d="M100,0 L200,0 L200,100 L100,100 Z" fill="#4285f4"/>
+    <text x="100" y="140" text-anchor="middle" font-family="Arial" font-size="24" fill="#333">Copy Saver</text>
+    <text x="100" y="170" text-anchor="middle" font-family="Arial" font-size="14" fill="#666">自动保存复制内容</text>
+  </g>
+</svg>

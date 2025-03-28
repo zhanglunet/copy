@@ -1,0 +1,20 @@
+{
+  "name": "copy-pub",
+  "main": "website",
+  "build": {
+    "baseDirectory": "website",
+    "command": null,
+    "destinationDirectory": "."
+  },
+  "routes": [
+    { "pattern": "**/*", "script": null }
+  ],
+  "headers": {
+    "/*": {
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "no-referrer-when-downgrade",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    }
+  }
+}

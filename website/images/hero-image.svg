@@ -1,0 +1,18 @@
+<svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- 浏览器窗口背景 -->
+  <rect x="10" y="10" width="480" height="280" rx="8" fill="#f5f5f5" stroke="#ddd" stroke-width="2" />
+  
+  <!-- 浏览器顶部栏 -->
+  <rect x="10" y="10" width="480" height="30" rx="8 8 0 0" fill="#e0e0e0" />
+  <circle cx="30" cy="25" r="6" fill="#ff6b6b" />
+  <circle cx="50" cy="25" r="6" fill="#ffd93d" />
+  <circle cx="70" cy="25" r="6" fill="#6bff6b" />
+  
+  <!-- 地址栏 -->
+  <rect x="100" y="15" width="300" height="20" rx="4" fill="white" />
+  
+  <!-- 网页内容 -->
+  <rect x="20" y="50" width="460" height="230" rx="4" fill="white" />
+  
+  <!-- 扩展弹出窗口 -->
+  <rect x="300" y="70" width="150" height

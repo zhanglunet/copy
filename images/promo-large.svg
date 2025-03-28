@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1280" height="800" viewBox="0 0 1280 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#f5f5f5"/>
+  <g transform="translate(240,160)">
+    <rect width="800" height="480" rx="8" fill="white" stroke="#e0e0e0" stroke-width="2"/>
+    <g transform="translate(40,40)">
+      <rect width="720" height="80" rx="4" fill="#f8f9fa"/>
+      <text x="20" y="50" font-family="Arial" font-size="24" fill="#333">Copy Saver - 自动保存您的复制内容</text>
+    </g>
+    <g transform="translate(40,160)">
+      <rect width="720" height="280" rx="4" fill="#ffffff" stroke="#e0e0e0" stroke-width="1"/>
+      <text x="20" y="40" font-family="Arial" font-size="18" fill="#666">✓ 自动捕获浏览器中的复制操作</text>
+      <text x="20" y="80" font-family="Arial" font-size="18" fill="#666">✓ 将复制的文本保存到指定目录</text>
+      <text x="20" y="120" font-family="Arial" font-size="18" fill="#666">✓ 每条记录带有时间戳，便于追踪</text>
+      <text x="20" y="160" font-family="Arial" font-size="18" fill="#666">✓ 简单易用，配置一次即可在后台自动工作</text>
+    </g>
+  </g>
+</svg>
