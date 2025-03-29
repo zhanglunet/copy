@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy Saver 技术架构流程图 | copy.pub</title>
+    <meta name="description" content="Copy Saver项目的技术架构流程图，包括Chrome扩展的核心组件和网站部署流程。">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        .blog-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .blog-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .blog-content h2 {
+            font-size: 2rem;
+            margin: 30px 0 15px;
+            color: #4285f4;
+        }
+        .blog-content h3 {
+            font-size: 1.5rem;
+            margin: 25px 0 10px;
+            color: #555;
+        }
+        .blog-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .blog-content code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .blog-content pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .blog-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .blog-content a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        .blog-content a:hover {
+            text-decoration: underline;
+        }
+        .back-to-home {
+            display: inline-block;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-to-home:hover {
+            background-color: #3367d6;
+            text-decoration: none;
+        }
+        .mermaid {
+            margin: 30px 0;
+            text-align: center;
+        }
+    </style>
+    <!-- 引入Mermaid.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                flowchart: {
+                    useMaxWidth: true,
+                    htmlLabels: true
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/logo.svg" alt="复制保存器图标">
+                <h1>复制保存器</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#features">功能</a></li>
+                    <li><a href="index.html#download">下载</a></li>
+                    <li><a href="index.html#faq">常见问题</a></li>
+                    <li><a href="blog-deployment-zh.html">博客</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="blog-header">
+        <div class="container">
+            <h1>Copy Saver 技术架构流程图</h1>
+            <p>使用流程图展示Copy Saver项目的技术架构，包括Chrome扩展的核心组件和网站部署流程。</p>
+        </div>
+    </section>
+
+    <section class="blog-content">
+        <div class="container">
+            <a href="index.html" class="back-to-home">返回首页</a>
+            
+            <p>本页面使用流程图展示了Copy Saver项目的技术架构，包括Chrome扩展的核心组件和网站部署流程。</p>
+
+            <h2>项目整体架构</h2>
+            <div class="mermaid">
+                graph TD
+                    subgraph "Chrome扩展"
+                        UI["前端UI<br/>(HTML/CSS/JavaScript)"] --> Logic["扩展逻辑<br/>(JavaScript)"] 
+                        Logic --> Storage["数据存储<br/>(Chrome Storage API)"] 
+                        Logic --> FileSystem["文件系统操作<br/>(Chrome Downloads API)"] 
+                    end
+                    
+                    subgraph "官方网站"
+                        WebUI["网站前端<br/>(HTML/CSS/JavaScript)"] --> Deploy["自动部署<br/>(Cloudflare Pages)"] 
+                    end
+                    
+                    User["用户"] --> UI
+                    User --> WebUI
+            </div>
+
+            <h2>Chrome扩展组件详细架构</h2>
+            <div class="mermaid">
+                graph TD
+                    subgraph "用户界面层"
+                        PopupHTML["popup.html<br/>(HTML/CSS)"] --> PopupJS["popup.js<br/>(交互逻辑)"] 
+                    end
+                    
+                    subgraph "核心逻辑层"
+                        ContentScript["contentScript.js<br/>(监听复制事件)"] --> BackgroundJS["background.js<br/>(后台服务)"] 
+                        PopupJS --> BackgroundJS
+                    end
+                    
+                    subgraph "数据处理层"
+                        BackgroundJS --> ChromeStorage["Chrome Storage API<br/>(保存配置和历史记录)"] 
+                        BackgroundJS --> DownloadsAPI["Chrome Downloads API<br/>(保存文件到本地)"] 
+                    end
+                    
+                    User["用户"] --> PopupHTML
+                    WebPage["网页"] --> ContentScript
+            </div>
+
+            <h2>数据流向</h2>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant User as 用户
+                    participant WebPage as 网页
+                    participant ContentScript as contentScript.js
+                    participant BackgroundJS as background.js
+                    participant Storage as Chrome Storage
+                    participant FileSystem as 文件系统
+                    
+                    User->>WebPage: 复制文本(Ctrl+C)
+                    WebPage->>ContentScript: 触发copy事件
+                    ContentScript->>BackgroundJS: 发送复制的文本
+                    BackgroundJS->>Storage: 保存到历史记录
+                    BackgroundJS->>FileSystem: 保存到本地文件
+            </div>
+
+            <h2>网站部署流程</h2>
+            <div class="mermaid">
+                graph LR
+                    subgraph "开发环境"
+                        LocalDev["本地开发<br/>(HTML/CSS/JS)"] --> GitRepo["Git仓库"] 
+                    end
+                    
+                    subgraph "自动部署"
+                        GitRepo --> CloudflarePages["Cloudflare Pages<br/>(静态网站托管)"] 
+                    end
+                    
+                    CloudflarePages --> LiveWebsite["线上网站<br/>(copy-pub)"] 
+            </div>
+
+            <h2>技术栈总览</h2>
+            <div class="mermaid">
+                mindmap
+                  root((Copy Saver))
+                    Chrome扩展
+                      前端
+                        HTML
+                        CSS
+                        JavaScript
+                      后端
+                        Chrome API
+                          Storage API
+                          Downloads API
+                          Runtime API
+                        JavaScript
+                    官方网站
+                      前端
+                        HTML
+                        CSS
+                        JavaScript
+                      部署
+                        Cloudflare Pages
+            </div>
+
+            <p><a href="blog-deployment-zh.html" class="back-to-home">返回博客</a></p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo.svg" alt="复制保存器图标">
+                    <h2>复制保存器</h2>
+                </div>
+                <div class="footer-links">
+                    <h3>链接</h3>
+                    <ul>
+                        <li><a href="index.html#features">功能</a></li>
+                        <li><a href="index.html#download">下载</a></li>
+                        <li><a href="index.html#faq">常见问题</a></li>
+                        <li><a href="blog-deployment-zh.html">博客</a></li>
+                        <li><a href="https://github.com/zhanglunet/copy" target="_blank" class="github-link">
+                            <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                            </svg>
+                            代码仓库
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>联系我们</h3>
+                    <p>如有任何问题或建议，请发送邮件至：</p>
+                    <a href="mailto:support@copy.pub">support@copy.pub</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 复制保存器. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
