@@ -1,0 +1,22 @@
+{
+  "appName": {
+    "message": "Copy Saver",
+    "description": "The name of the extension"
+  },
+  "appDesc": {
+    "message": "A convenient Chrome extension that automatically saves content you copy in your browser to local text files. Supports custom save paths to help you better manage and organize copied information.",
+    "description": "The description of the extension"
+  },
+  "autoSaveButton": {
+    "message": "Enable Auto Save",
+    "description": "Enable auto save button text"
+  },
+  "statusEnabled": {
+    "message": "Status: Auto save enabled, copy operations will be automatically saved to the download folder",
+    "description": "Enabled status text"
+  },
+  "statusWaiting": {
+    "message": "Status: Waiting for auto save to be enabled",
+    "description": "Waiting for enable status text"
+  }
+}

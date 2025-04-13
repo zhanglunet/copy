@@ -1,10 +1,18 @@
 // popup.js
 // 处理弹出界面的交互逻辑
 
+// 本地化函数
+function getLocalizedMessage(messageName) {
+    return chrome.i18n.getMessage(messageName) || messageName;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const chooseDirectoryButton = document.getElementById('chooseDirectory');
     const statusElement = document.getElementById('status');
     const DIRECTORY_ID_KEY = 'savedDirectoryId';
+    
+    // 本地化UI元素
+    chooseDirectoryButton.textContent = getLocalizedMessage('autoSaveButton');
     
     // 更新状态显示
     function updateStatus() {
@@ -12,12 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const savedDirectoryId = items[DIRECTORY_ID_KEY];
             
             if (savedDirectoryId) {
-                statusElement.textContent = '状态：已启用自动保存，复制操作将自动保存到下载文件夹';
+                statusElement.textContent = getLocalizedMessage('statusEnabled');
                 statusElement.style.color = '#4caf50';
                 chooseDirectoryButton.textContent = '已启用自动保存';
                 chooseDirectoryButton.disabled = true;
             } else {
-                statusElement.textContent = '状态：等待启用自动保存';
+                statusElement.textContent = getLocalizedMessage('statusWaiting');
                 statusElement.style.color = '#f44336';
             }
         });
